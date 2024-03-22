@@ -1,6 +1,8 @@
 import streamlit as st
 from entities.hospital import Hospital
 from entities.patient import Patient
+from validation import validate_email, validate_phone
+import datetime
 
 st.set_page_config(layout="wide")
 
@@ -20,29 +22,39 @@ with left_column:
         patient_id = st.text_input("Patient ID")
         patient_age = st.text_input("Patient Age")
         patient_phone = st.text_input("Phone")
+        
+        # validate patient phone number entered by the user
+        if patient_phone and not validate_phone(patient_phone):
+            st.error("Please enter a valid phone number")
+            
         patient_email = st.text_input("Email")
-        patient_date_of_birth = st.date_input("Date of Birth")
+        
+        # Validate email address entered by the user
+        if patient_email and not validate_email(patient_email):
+            st.error("Please enter a valid email address")
+            
         patient_blood_type = st.selectbox("Blood Type", ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"])
         patient_nationality = st.text_input("Nationality")
         patient_occupation = st.text_input("Occupation")
-        patient_address = st.text_area("Address")
-        
-        patient_emergency_contact = st.text_input("Emergency Contact")
+        patient_medical_history = st.text_area("Medical History")
+        patient_allergies = st.text_area("Allergies")
         
     with split_columns2:
         patient_name = st.text_input("Patient Name")
+        patient_date_of_birth = st.date_input("Date of Birth",min_value=datetime.date(1900,1,1)
+                                              ,max_value=datetime.date.today(),
+                                              value=datetime.date.today())
         patient_gender = st.selectbox("Gender", ["Male", "Female", "Other"])
         patient_marital_status = st.selectbox("Marital Status", ["Single", "Married", "Divorced", "Widowed"])
         patient_primary_care_physician = st.text_input("Primary Care Physician")
-        patient_medical_history = st.text_area("Medical History")
-        patient_allergies = st.text_area("Allergies")
-        patient_medications = st.text_area("Medications")
+        patient_address = st.text_area("Address")
         patient_insurance_info = st.text_area("Insurance Info")
+        patient_medications = st.text_area("Medications")
+        patient_emergency_contact = st.text_input("Emergency Contact")
         
 with right_column:
     
     # Hospital details
-    
     st.header("Hospital Details")
     hospital_name = st.text_input("Hospital Name")
     hospital_address = st.text_input("Hospital Address")
@@ -56,6 +68,7 @@ with right_column:
     submit_button = st.button(submit_button_label,)
 
 
+# Submitting the data using submit button
 if submit_button:
     hospital = Hospital(name=hospital_name, address=hospital_address, city="", state="",
                         zipcode="", phone="", email="", website="")
